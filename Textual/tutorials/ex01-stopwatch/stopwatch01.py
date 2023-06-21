@@ -7,6 +7,14 @@ class TimeDisplay(Static):
 
 class Stopwatch(Static):
     """A stopwatch widget"""
+    
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Event handler called when a button is pressed."""
+        if event.button.id == "start":
+            self.add_class("started")
+        elif event.button.id == "stop":
+            self.remove_class("started")
+
     def compose(self) -> ComposeResult:
         """Create child widgets of a stopwatch"""
         yield Button("Start", id="start", variant="success")
