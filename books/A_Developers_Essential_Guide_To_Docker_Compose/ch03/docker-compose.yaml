@@ -16,6 +16,9 @@ services:
       - redis
     labels:
       - com.packtpub.compose.app=task-manager
+    networks:
+      - task-manager-public-network
+      - redis-network
   redis:
     image: redis
     ports:
@@ -26,6 +29,8 @@ services:
     volumes:
       - ./redis.conf:/usr/local/etc/redis/redis.conf
       - redis-data:/data
+    networks:
+      - redis-network
   redis-populate:
     image: redis
     entrypoint: ["/redis-populate.sh", "/redis-populate.txt"]
@@ -38,6 +43,8 @@ services:
       - ./redis-populate.sh:/redis-populate.sh
     labels:
       - com.packtpub.compose.app=task-manager
+    networks:
+      - redis-network
   redis-backup:
     image: bash
     entrypoint: ["/snapshot-backup.sh"]
@@ -51,10 +58,19 @@ services:
       - backup:/backup
     labels:
       - com.packtpub.compose.app=task-manager
+    networks:
+      - redis-network
 volumes:
   redis-data:
     labels:
       - com.packtpub.compose.app=task-manager
   backup:
+    labels:
+      - com.packtpub.compose.app=task-manager
+networks:
+  task-manager-public-network:
+    labels:
+      - com.packtpub.compose.app=task-manager
+  redis-network:
     labels:
       - com.packtpub.compose.app=task-manager
