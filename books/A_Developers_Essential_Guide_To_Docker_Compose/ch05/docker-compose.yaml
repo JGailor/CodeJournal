@@ -1,0 +1,37 @@
+services:
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - redis-network
+  location-service:
+    build:
+      context: ./location-service
+    image: location-service:0.1
+    environment:
+      - REDIS_HOST=redis:6379
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - redis-network
+      - location-network
+  event-service:
+    build:
+      context: ./events-service
+    image: events-service:0.1
+    environment:
+      - REDIS_HOST=redis:6379
+    depends_on:
+      - redis
+    networks:
+      - redis-network
+networks:
+  location-network:
+  redis-network:
